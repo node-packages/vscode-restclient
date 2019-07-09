@@ -117,10 +117,14 @@ export class HttpRequestParser implements IRequestParser {
         if (isGraphQlRequest) {
             variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
 
-            let graphQlPayload = {
-                query: body,
-                variables: variables ? JSON.parse(variables.toString()) : {}
+            const graphQlPayload = {
+                query: body
             };
+
+            if (variables) {
+                Object.assign(graphQlPayload, { variables: JSON.parse(variables.toString()) });
+            }
+
             body = JSON.stringify(graphQlPayload);
         } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
